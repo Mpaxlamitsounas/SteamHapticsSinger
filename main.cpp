@@ -331,10 +331,10 @@ bool parseArguments(int argc, char** argv, ParamsStruct* params){
 				params->intervalUSec = value;
 			}
 			break;
-		case 'g':
+		case 'y':
 			legacyInst = true;
 			break;
-		case 'r':
+		case 'p':
 			params->repeatSong = true;
 			break;
 		case '?':
@@ -381,7 +381,7 @@ int main(int argc, char** argv)
 
 	//Parse arguments
 	if(!parseArguments(argc, argv, &params)){
-		cout << "Usage: steam-haptics-singer [-r] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE" << endl;
+		cout << "Usage: steam-haptics-singer [-p] [-y] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE\n  -p    Repeat song\n  -y    Legacy playback, forces usage of the old Steam Controller haptic instruction instead of the new one (causes issues)" << endl;
 		return 1;
 	}
 
