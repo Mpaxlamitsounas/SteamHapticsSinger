@@ -381,7 +381,11 @@ int main(int argc, char** argv)
 
 	//Parse arguments
 	if(!parseArguments(argc, argv, &params)){
-		cout << "Usage: steam-haptics-singer [-p] [-y] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE\n  -p    Repeat song\n  -y    Legacy playback, forces usage of the old Steam Controller haptic instruction instead of the new one (causes issues)" << endl;
+		cout << "Usage: steam-haptics-singer [-p] [-y] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE\n\n"
+				"  -i INTERVAL		Player sleep interval (in microseconds). Lower generally means better song fidelity, but higher cpu usage, and at some point going lower won't improve any more. Default value is 10000\n"
+				"  -d DEBUG_LEVEL	Libusb debug level. Default is 0, no debug output. max is 4, max verbosity output\n"
+		        "  -p	Repeat song, plays again after ending\n"
+				"  -y	Legacy playback, forces usage of the old Steam Controller haptic instruction instead of the new one (causes issues)" << endl;
 		return 1;
 	}
 

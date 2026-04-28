@@ -18,10 +18,10 @@ Songs ready to play can be found in the original guy's [personal collection](htt
 ### Usage from command prompt:
 	Usage: steam-haptics-singer [-p] [-y] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE
 
-	  -i INTERVAL      Player sleep interval (in microseconds). Lower generally means better song fidelity, but higher cpu usage, and at some point going lower won't improve any more. Default value is 10000
-	  -d DEBUG_LEVEL   Libusb debug level. Default is 0, no debug output. max is 4, max verbosity output
-	  -p      Repeat song, plays again after ending
-	  -y      Legacy playback, forces usage of the old Steam Controller haptic instruction instead of the new one (causes issues)
+	  -i INTERVAL		Player sleep interval (in microseconds). Lower generally means better song fidelity, but higher cpu usage, and at some point going lower won't improve any more. Default value is 10000
+	  -d DEBUG_LEVEL	Libusb debug level. Default is 0, no debug output. max is 4, max verbosity output
+	  -p	Repeat song, plays again after ending
+	  -y	Legacy playback, forces usage of the old Steam Controller haptic instruction instead of the new one (causes issues)
 
 ### Midi files tips:
 
