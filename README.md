@@ -35,6 +35,23 @@ Midi files may need to be edited with a software such as [MidiEditor](https://ww
 * Notes from others channels are ignored
 * **Avoid multiple notes active at the same time on the same channel**, since haptic actuators can only play one note at the time.
 
+
+## Compiling
+
+You will need libusb(-dev) and pkgconf. If you have them, just type `make`.
+
+It's recommended to build this in a container such as [steam-runtime](https://github.com/ValveSoftware/steam-runtime?tab=readme-ov-file#building-in-the-runtime) or [holo-docker](https://github.com/SteamDeckHomebrew/holo-docker) in order for the packges to line up with the Steam Deck.
+
+If you go the steam-runtime route, make sure to use sniper as scout is outdated.
+
+### For a guide:
+	git clone -b master https://github.com/CrazyCritic89/SteamHapticsSinger.git
+	cd SteamHapticsSinger
+	podman run --rm -v ./:/src -it registry.gitlab.steamos.cloud/steamrt/sniper/sdk bash
+	make
+	exit
+
+
 ## CHANGELOG
 
 [My v1.9 Build :> (EXCLUSIVE)]
@@ -67,7 +84,3 @@ Midi files may need to be edited with a software such as [MidiEditor](https://ww
 [v1.2]
 * Fixed being stuck on "Command error" when disconnecting controller while playing. Now continue playing (even if keep failing)
 * Removed the now deprecated 20ms note duration reduction
-
-## Compiling
-
-You will need libusb(-dev) and pkgconf. If you have them, just type `make`.
