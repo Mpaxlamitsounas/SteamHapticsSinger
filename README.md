@@ -16,13 +16,12 @@ I gotta say, I'm no expert and barely know how this thing works, but I hope to a
 Songs ready to play can be found in the original guy's [personal collection](https://mega.nz/#F!BWpEWKzB!r7WPw5bZ_domN4pk-FJsjg) (as he called it). Otherwise, you can just try a MIDI and see what happens (most of the time it won't work well).
 
 ### Usage from command prompt:
-	steam-haptics-singer [-r] [-l DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE
+	Usage: steam-haptics-singer [-p] [-y] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE
 
-	-i INTERVAL argument to choose player sleep interval (in microseconds). Lower generally means better song fidelity, but higher cpu usage, and at some point goidn lower won't improve any more. Default value is 10000
-
-	-l DEBUG_LEVEL argument to choose libusb debug level. Default is 0, no debug output. max is 4, max verbosity output
-	
-	-r to enable repeat mode, which plays continously (restart the song when finished)
+	  -i INTERVAL      Player sleep interval (in microseconds). Lower generally means better song fidelity, but higher cpu usage, and at some point going lower won't improve any more. Default value is 10000
+	  -d DEBUG_LEVEL   Libusb debug level. Default is 0, no debug output. max is 4, max verbosity output
+	  -p      Repeat song, plays again after ending
+	  -y      Legacy playback, forces usage of the old Steam Controller haptic instruction instead of the new one (causes issues)
 
 ### Midi files tips:
 
