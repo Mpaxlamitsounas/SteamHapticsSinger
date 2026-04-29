@@ -52,6 +52,17 @@ If you go the steam-runtime route, make sure to use sniper as scout is outdated.
 
 ## CHANGELOG
 
+[v1.10]
+* Implemented Steam Deck-specific haptic command referencing https://gitlab.com/evlaV/jupiter-validation-tools/-/blob/master/rtst/controller_if.py (thanks to @AAGaming00 for telling me). This now makes songs play correctly on it.
+* Updated midifile library 
+* Note stop now sets the frequency to 0
+* Removed reclaim period, no longer needed and was causing issues
+* Legacy command toggle with -y
+* Repeat song toggle changed from -r to -p
+* Changed debug level argument back from -l to -d
+* Updated usage to show more info
+* Naturals now have a dash in the middle (C5 -> C-5)
+
 [My v1.9 Build :> (EXCLUSIVE)]
 * Badly added Deck support. No improvements.
 
