@@ -86,6 +86,11 @@ bool SteamController_Open(SteamControllerInfos* controller){
 		controller->interfaceNum = 2;
 		controller->type = ControllerType::Triton;
 		controller->endPoint = 0x02;
+		//Workaround for controller disconnecting after puck reconnects on Windows
+		#ifdef _WIN32
+		cout << "Reconnect controller and press Enter...";
+    	cin.get(); 
+		#endif
 	}
 	else if((dev_handle = libusb_open_device_with_vid_pid(NULL, 0x28DE, 0x1205)) != NULL){ // Steam Deck
 		cout<<"Found Steam Deck"<<endl;
