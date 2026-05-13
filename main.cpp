@@ -50,6 +50,7 @@ struct SteamControllerInfos{
 	ControllerType type = ControllerType::None;
 	signed char leftGain;
 	signed char rightGain;
+	int endPoint;
 };
 
 SteamControllerInfos steamController1;
@@ -77,6 +78,14 @@ bool SteamController_Open(SteamControllerInfos* controller){
 		controller->dev_handle = dev_handle;
 		controller->interfaceNum = 0;
 		controller->type = ControllerType::Triton;
+		controller->endPoint = 0x01;
+	}
+	else if((dev_handle = libusb_open_device_with_vid_pid(NULL, 0x28DE, 0x1304)) != NULL){ // Steam Puck
+		cout<<"Found Steam Puck, will attempt to use the first Steam Controller (2026)"<<endl;
+		controller->dev_handle = dev_handle;
+		controller->interfaceNum = 2;
+		controller->type = ControllerType::Triton;
+		controller->endPoint = 0x02;
 	}
 	else if((dev_handle = libusb_open_device_with_vid_pid(NULL, 0x28DE, 0x1205)) != NULL){ // Steam Deck
 		cout<<"Found Steam Deck"<<endl;
@@ -161,7 +170,7 @@ int SteamHaptics_PlayNote(SteamControllerInfos* controller, int haptic, int note
 		dataBlob[2] = 0xFE;
 		dataBlob[3] = (int)frequency % 0xFF;
 		dataBlob[4] = (int)frequency / 0xFF;
-		r = libusb_interrupt_transfer(controller->dev_handle,0x01,dataBlob,16,NULL,1000);
+		r = libusb_interrupt_transfer(controller->dev_handle,controller->endPoint,dataBlob,16,NULL,1000);
 		if(r < 0) {
 			cout<<"Command Error "<<r<< endl;
 			exit(0);
