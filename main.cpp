@@ -156,7 +156,7 @@ int SteamHaptics_PlayNote(SteamControllerInfos* controller, int haptic, int note
 		dataBlob[8] = repeatCommand / 0xFF;
 		dataBlob[9] = 0x7F;
 		dataBlob[10]= 0xFF;
-		r = libusb_control_transfer(controller->dev_handle,0x21,9,0x0300,2,dataBlob,16,1000);
+		r = libusb_control_transfer(controller->dev_handle,0x21,9,0x0300,controller->interfaceNum,dataBlob,16,1000);
 		if(r < 0) {
 			cout<<"Command Error "<<r<< endl;
 			exit(0);
