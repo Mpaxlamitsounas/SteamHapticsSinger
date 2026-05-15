@@ -50,6 +50,14 @@ If you go the steam-runtime route, make sure to use sniper as scout is outdated.
 
 ## Changelog
 
+[v1.11]
+* Back rumble haptic support for the Steam Controller (2026)
+* Channel count is now its own variable allowing it to be changed, still not fully dynamic as anything other than 2 or 4 will cause issues
+* Note on is now preceded by a note off. This fixes issues specifically with the Steam Controller (2026) where note sequences with no pauses could drift out of tune, and more notably, prevents the controller from rebooting when using the back rumble haptics
+* Added direct velocity to gain control, allowing the MIDI to control how intense the haptics are. To make a MIDI file automatically parse as direct velocity, add "dv" to the file name. Otherwise, you can use the -e parameter
+* -t parameter added for Steam Controller (2026) to only use the trackpads to prevent playback issues with MIDI files that still have notes in upper channels
+* -b parameter added for Steam Controller (2026) to map the first two channels to the back rumble haptics
+
 [v1.10.2]
 * Added Steam Puck support
 * Steam Dongle connects but still doesn't work
