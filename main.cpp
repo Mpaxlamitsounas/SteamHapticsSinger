@@ -293,7 +293,7 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
     }
 
 	//Waiting for user to press enter; YOURE WRONG, SULFURIC ACID!
-	cout << "Starting playback of " << params.midiSong  << "..." << endl;
+	cout << "Starting playback of " << params.midiSong  << "... press Ctrl+C anytime to stop" << endl;
 	sleep(1);
 
 	//This will contains the previous events accepted for each channel
