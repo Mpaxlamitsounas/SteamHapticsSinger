@@ -22,17 +22,17 @@ Songs ready to play can be found in the original guy's [personal collection](htt
 	  -d DEBUG_LEVEL	Libusb debug level. Default is 0, no debug output. max is 4, max verbosity output
 	  -p	Repeat song, plays again after ending
 	  -e 	Direct velocity to gain control, the MIDI file will set the gain"
-	  -t	(Steam Controller 2026 Only) Only use trackpads
-	  -b	(Steam Controller 2026 Only) Map first two channels to rumble instead of trackpads
+	  -t	(Steam Controller 2026 Only) Limit to only two channels"
+	  -s	(Steam Controller 2026 Only) Swap rumble and trackpad channels"
 
 ### MIDI files tips:
 
 MIDI files may need to be edited with a software such as [MidiEditor](https://www.midieditor.org/) to be correctly played with Steam Haptics Singer following the next tips:
 
-* Notes from MIDI channel 0 are played on right haptic
-* Notes from MIDI channel 1 are played on left haptic
-* Notes from MIDI channel 2 are played on right rumble (Steam Controller 2026 only)
-* Notes from MIDI channel 3 are played on left rumble (Steam Controller 2026 only)
+* Notes from MIDI channel 0 are played on right haptic/rumble
+* Notes from MIDI channel 1 are played on left haptic/rumble
+* Notes from MIDI channel 2 are played on right haptic (Steam Controller 2026 only)
+* Notes from MIDI channel 3 are played on left haptic (Steam Controller 2026 only)
 * Notes from others channels are ignored
 * **Avoid multiple notes active at the same time on the same channel**, since haptic actuators can only play one note at the time.
 
@@ -55,6 +55,15 @@ If you go the steam-runtime route, make sure to use sniper as scout is outdated.
 
 
 ## Changelog
+
+[v1.11.1]
+* Steam Controller (2026) now defaults to using rumble for the first two channels
+* Removed -t and -b parameters
+* Added -s parameter to swap the rumble and trackpad channels (credit to @Pixel1011 for the idea)
+* Added -t parameter to limit to only two channels (can work in tandem with -s)
+* Fixed -d paramter
+* Renamed "rumble" to "haptic" in playback display (temporary)
+* Errors now give names instead of values
 
 [v1.11]
 * Back rumble haptic support for the Steam Controller (2026)
