@@ -114,6 +114,7 @@ You will need libusb(-dev), hidapi-hidraw, and pkgconf. If you have them, just t
 ## Changelog
 
 [v1.11.2]
+* The program now looks through the connected devices on a Steam Puck to find the first Steam Controller (2026)
 * Steam Controller (2026) is now handled by HIDAPI
 
 [v1.11.1]
