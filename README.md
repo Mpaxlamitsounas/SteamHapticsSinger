@@ -60,6 +60,8 @@ This project aims to be a continuation of SteamControllerSinger (forked from [Ro
 
 I have made a small [Discord server](https://discord.gg/TWpvAxX5GW) for sharing MIDI files and updates easier for anyone interested.
 
+NOTE: For Steam Controller (2015), make sure the BLE firmware is NOT installed.
+
 ## How To
 
 1. [Download the latest release](https://github.com/CrazyCritic89/SteamHapticsSinger/releases) (the Linux build is the one with no file extension)
