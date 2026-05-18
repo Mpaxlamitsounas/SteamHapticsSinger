@@ -62,7 +62,8 @@ I have made a small [Discord server](https://discord.gg/TWpvAxX5GW) for sharing 
 
 ## How To
 
-Turn on your Steam Controller (2015 or 2026) or Steam Deck
+1. [Download the latest release](https://github.com/CrazyCritic89/SteamHapticsSinger/releases) (the Linux build is the one with no file extension)
+2. Turn on your Steam Controller (2015 or 2026) or Steam Deck
 
 #### On Linux
 1. Right click inside the folder
