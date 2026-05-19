@@ -39,7 +39,7 @@ bool legacyInst = false;
 bool directVel = false;
 bool tritonLimit = false;
 int channelCount = 2;
-int remapChannel[CHANNEL_COUNT];
+int remapChannel[16]; // max MIDI channels
 bool remapApplied = false;
 bool tritonSwap = false;
 
@@ -331,9 +331,10 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 
 			//Get channel event
 			int eventChannel = MidiFileVoiceEvent_getChannel(currentEvent);
+			int remappedChannel = remapChannel[eventChannel];
 
-			//If channel is other than 0 or 1, skip this event, we cannot play it with only 1 steam controller
-			if(eventChannel < 0 || !(eventChannel < CHANNEL_COUNT)) continue;
+			// Channel disabled or output channel above max channels
+			if(eventChannel < 0 || remappedChannel >= CHANNEL_COUNT || remappedChannel == -1) continue;
 
 			//If event is note off and does not match previous played event, skip it
 			if(MidiFileEvent_isNoteEndEvent(currentEvent)){
@@ -349,10 +350,8 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 			//If we arrive here, this event is accepted
 			acceptedEventPerChannel[eventChannel] = currentEvent;
 
-			// Remap channels
-			if (remapChannel[eventChannel] != -1) {
-				eventsToPlay[remapChannel[eventChannel]] = currentEvent;
-			}
+			// Remapping happens here
+			eventsToPlay[remappedChannel] = currentEvent;
 		}
 
 		//Now play the last events
@@ -446,7 +445,7 @@ bool parseArguments(int argc, char** argv, ParamsStruct* params){
 				*ptr = '\0';
 				long int originChannel = strtol(optarg, NULL, 10);
 				long int destChannel = strtol(ptr+1, NULL, 10);
-				if (originChannel >= CHANNEL_COUNT || destChannel >= CHANNEL_COUNT || originChannel < -1 || destChannel < -1) {
+				if (destChannel >= CHANNEL_COUNT || originChannel < 0 || destChannel < -1) {
 					printf("Ignoring remap option %s, channel out of range\n", optarg);
 					break;
 				}
@@ -499,7 +498,7 @@ int main(int argc, char** argv)
 	//params.leftGain = DEFAULT_GAIN;
 	//params.rightGain = DEFAULT_GAIN;
 
-	for (int i = 0; i < CHANNEL_COUNT; i++) {
+	for (int i = 0; i < 16; i++) {
 		remapChannel[i] = i;
 	}
 
@@ -516,7 +515,6 @@ int main(int argc, char** argv)
 				"" << endl;
 		return 1;
 	}
-
 
 	//Initializing LIBUSB
 	int r = libusb_init(NULL);
