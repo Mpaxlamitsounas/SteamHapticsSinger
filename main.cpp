@@ -38,8 +38,10 @@ struct ParamsStruct{
 bool legacyInst = false;
 bool directVel = false;
 bool tritonLimit = false;
-bool tritonSwap = false;
 int channelCount = 2;
+int remapChannel[CHANNEL_COUNT];
+bool remapApplied = false;
+bool swapEnabled = false;
 
 enum class ControllerType {
 	None,
@@ -198,16 +200,10 @@ int SteamHaptics_PlayNote(SteamControllerInfos* controller, int channel, int not
 		if (note == NOTE_STOP) {
 			//This prevents the controller from rebooting when using rumble motors and drifting out of tune
 			dataBlob[0] = 0x81;
-			dataBlob[1] = (tritonSwap) ?
-						  ((channel < 2) ? channel : !(channel-2)+3) :
-						  ((channel < 2) ? !channel+3 : channel-2);			  
-			//dataBlob[1] = ((channel < 2) != tritonSwap) ? !channel+3 : channel-2;
+			dataBlob[1] = ((channel < 2) ? !channel+3 : channel-2);
 		} else {
 			dataBlob[0] = 0x83;
-			dataBlob[1] = (tritonSwap) ?
-						  ((channel < 2) ? !channel : !(channel-2)+3) :
-						  ((channel < 2) ? !channel+3 : !(channel-2));
-			//dataBlob[1] = ((channel < 2) != tritonSwap) ? !channel+3 : !(channel-2);
+			dataBlob[1] = ((channel < 2) ? !channel+3 : !(channel-2));
 			dataBlob[2] = (directVel) ? (velocity * 255) / 127 - 128 : 0xFE;
 			dataBlob[3] = (int)frequency % 0xFF;
 			dataBlob[4] = (int)frequency / 0xFF;
@@ -253,17 +249,11 @@ float timeElapsedSince(std::chrono::steady_clock::time_point tOrigin){
 }
 
 
-void displayPlayedNotes(int channel, int8_t note){
-	static int8_t notePerChannel[CHANNEL_COUNT] = {NOTE_STOP, NOTE_STOP, NOTE_STOP, NOTE_STOP};
-	const char* textPerChannel[CHANNEL_COUNT] = {"LEFT haptic : ",", RIGHT haptic : ",", LEFT haptic : ",", RIGHT haptic : "};
+void displayPlayedNotes(int iterStart, int iterStop, int8_t *notePerChannel){
+	const char* textPerChannel[CHANNEL_COUNT] = {"RIGHT rumble : ","LEFT rumble : ","RIGHT haptic : ","LEFT haptic : "};
 	const char* noteBaseNameArray[12] = {"C-","C#","D-","D#","E-","F-","F#","G-","G#","A-","A#","B-"};
 
-	if(channel >= channelCount)
-		return;
-
-	notePerChannel[(channel < 2) ? !channel : !(channel-2)+2] = note;
-
-	for(int i = 0 ; i < channelCount ; i++){
+	for(int i = iterStart ; i < iterStop ; i++){
 		cout << textPerChannel[i];
 
 		//Write empty string
@@ -279,6 +269,8 @@ void displayPlayedNotes(int channel, int8_t note){
 				cout << " ";
 			}
 		}
+		
+		if (i < iterStop - 1) printf(", ");
 	}
 
 	cout << "\r" ;
@@ -341,7 +333,7 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 			int eventChannel = MidiFileVoiceEvent_getChannel(currentEvent);
 
 			//If channel is other than 0 or 1, skip this event, we cannot play it with only 1 steam controller
-			if(eventChannel < 0 || !(eventChannel < channelCount)) continue;
+			if(eventChannel < 0 || !(eventChannel < CHANNEL_COUNT)) continue;
 
 			//If event is note off and does not match previous played event, skip it
 			if(MidiFileEvent_isNoteEndEvent(currentEvent)){
@@ -355,17 +347,24 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 			}
 
 			//If we arrive here, this event is accepted
-			eventsToPlay[eventChannel] = currentEvent;
-			acceptedEventPerChannel[eventChannel]=currentEvent;
+			acceptedEventPerChannel[eventChannel] = currentEvent;
+
+			// Remap channels
+			if (remapChannel[eventChannel] != -1) {
+				eventsToPlay[remapChannel[eventChannel]] = currentEvent;
+			}
 		}
 
-		//Now play the last events found
-		for(int currentChannel = 0 ; currentChannel < channelCount ; currentChannel++){
+		//Now play the last events
+		int iterStart = 0 + 2 * (tritonLimit && swapEnabled);
+		int iterStop = CHANNEL_COUNT - 2 * tritonLimit + 2 * (tritonLimit && swapEnabled);
+		static int8_t notePerChannel[CHANNEL_COUNT] = {NOTE_STOP, NOTE_STOP, NOTE_STOP, NOTE_STOP};
+
+		for(int currentChannel = iterStart; currentChannel < iterStop; currentChannel++){
 			MidiFileEvent_t selectedEvent = eventsToPlay[currentChannel];
 
 			//If no note event available on the channel, skip it
 			if(!MidiFileEvent_isNoteStartEvent(selectedEvent) && !MidiFileEvent_isNoteEndEvent(selectedEvent)) continue;
-
 			//Set note event
 			int8_t eventNote = NOTE_STOP;
 			int8_t eventVel  = 0;
@@ -378,9 +377,10 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 
 			//Play notes
 			SteamHaptics_PlayNote(controller,currentChannel,eventNote,eventVel);
-
-			displayPlayedNotes(currentChannel,eventNote);
+			notePerChannel[currentChannel] = eventNote;
 		}
+
+		displayPlayedNotes(iterStart, iterStop, notePerChannel);
 	}
 
 	for(int i = 0 ; i < CHANNEL_COUNT ; i++){
@@ -390,13 +390,9 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 	cout <<endl<< "Playback completed " << endl;
 }
 
-
-
-
-
 bool parseArguments(int argc, char** argv, ParamsStruct* params){
 	int c;
-	while ( (c = getopt(argc, argv, "d:i:pets")) != -1) {
+	while ( (c = getopt(argc, argv, "d:i:r:pets")) != -1) {
 		unsigned long int value;
 		switch(c){
 		/*case 'l':
@@ -433,7 +429,31 @@ bool parseArguments(int argc, char** argv, ParamsStruct* params){
 			tritonLimit = true;
 			break;
 		case 's':
-			tritonSwap = true;
+			if (remapApplied) printf("Swap overrides all previous remaps\n");
+			swapEnabled = true;
+			remapChannel[0] = 2;
+			remapChannel[1] = 3;
+			remapChannel[2] = 0;
+			remapChannel[3] = 1;
+			break;
+		case 'r': {
+				if (swapEnabled) printf("Overriding previously applied swap\n");
+				char* ptr;
+				if ((ptr = strstr(optarg, ":")) == NULL) {
+					printf("Ignoring remap option %s, missing separator\n", optarg);
+					break;
+				}
+				*ptr = '\0';
+				long int originChannel = strtol(optarg, NULL, 10);
+				long int destChannel = strtol(ptr+1, NULL, 10);
+				if (originChannel >= CHANNEL_COUNT || destChannel >= CHANNEL_COUNT || originChannel < -1 || destChannel < -1) {
+					printf("Ignoring remap option %s, channel out of range\n", optarg);
+					break;
+				}
+
+				remapApplied = true;
+				remapChannel[originChannel] = destChannel;
+			}
 			break;
 		// case 'y':
 		// 	legacyInst = true;
@@ -479,15 +499,19 @@ int main(int argc, char** argv)
 	//params.leftGain = DEFAULT_GAIN;
 	//params.rightGain = DEFAULT_GAIN;
 
+	for (int i = 0; i < CHANNEL_COUNT; i++) {
+		remapChannel[i] = i;
+	}
 
 	//Parse arguments
 	if(!parseArguments(argc, argv, &params)){
-		cout << "Usage: steam-haptics-singer [-p] [-y] [-d DEBUG_LEVEL] [-i INTERVAL] MIDI_FILE\n"
+		cout << "Usage: steam-haptics-singer [-p] [-d DEBUG_LEVEL] [-i INTERVAL] [-e] [-t] [-r CHANNEL:CHANNEL] MIDI_FILE\n"
 			  "\n  -i INTERVAL		Player sleep interval (in microseconds). Lower generally means better song fidelity, but higher cpu usage, and at some point going lower won't improve any more. Default value is 10000"
 			  "\n  -d DEBUG_LEVEL	Libusb debug level. Default is 0, no debug output. max is 4, max verbosity output"
 		      "\n  -p	Repeat song, plays again after ending"
 			  "\n  -e 	Direct velocity to gain control, the MIDI file will set the gain"
 			  "\n  -t	(Steam Controller 2026 Only) Limit to only two channels"
+			  "\n  -r CHANNEL:CHANNEL	Remap first channel to second, -1 to disable first channel"
 			  "\n  -s	(Steam Controller 2026 Only) Swap rumble and trackpad channels"
 				"" << endl;
 		return 1;
