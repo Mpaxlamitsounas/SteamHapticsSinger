@@ -41,7 +41,7 @@ bool tritonLimit = false;
 int channelCount = 2;
 int remapChannel[CHANNEL_COUNT];
 bool remapApplied = false;
-bool swapEnabled = false;
+bool tritonSwap = false;
 
 enum class ControllerType {
 	None,
@@ -356,8 +356,8 @@ void playSong(SteamControllerInfos* controller,const ParamsStruct params){
 		}
 
 		//Now play the last events
-		int iterStart = 0 + 2 * (tritonLimit && swapEnabled);
-		int iterStop = CHANNEL_COUNT - 2 * tritonLimit + 2 * (tritonLimit && swapEnabled);
+		int iterStart = 0 + 2 * (tritonLimit && tritonSwap);
+		int iterStop = CHANNEL_COUNT - 2 * tritonLimit + 2 * (tritonLimit && tritonSwap);
 		static int8_t notePerChannel[CHANNEL_COUNT] = {NOTE_STOP, NOTE_STOP, NOTE_STOP, NOTE_STOP};
 
 		for(int currentChannel = iterStart; currentChannel < iterStop; currentChannel++){
@@ -430,14 +430,14 @@ bool parseArguments(int argc, char** argv, ParamsStruct* params){
 			break;
 		case 's':
 			if (remapApplied) printf("Swap overrides all previous remaps\n");
-			swapEnabled = true;
+			tritonSwap = true;
 			remapChannel[0] = 2;
 			remapChannel[1] = 3;
 			remapChannel[2] = 0;
 			remapChannel[3] = 1;
 			break;
 		case 'r': {
-				if (swapEnabled) printf("Overriding previously applied swap\n");
+				if (tritonSwap) printf("Overriding previously applied swap\n");
 				char* ptr;
 				if ((ptr = strstr(optarg, ":")) == NULL) {
 					printf("Ignoring remap option %s, missing separator\n", optarg);
