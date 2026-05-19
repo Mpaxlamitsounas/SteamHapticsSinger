@@ -1,3 +1,10 @@
+# Changes
+Added support for remapping MIDI channels through an option. The syntax is -r CHANNEL:CHANNEL with the first channel being remapped to the second, setting the second channel to -1 disables the first.
+Move tritonSwap logic to a centralised place instead of calculating it every time. This allows to mesh well with remaps.
+Renamed controller outputs to differentiate between rumble and haptics, hopefully the naming is accurate for the 2015 steam controller.
+Cleaned up removed options from the help menu.
+Rework the controller output printing to print once per iteration.
+
 # Steam Haptics Singer
 <img align="left" height="90" alt="shs_icon_new" src="https://github.com/user-attachments/assets/0c7629e8-b289-47d1-b0f1-560037f4139e" />
 <svg
