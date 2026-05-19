@@ -1,4 +1,4 @@
-# Changes
+# Changes compared to upstream
 * Added support for remapping MIDI channels through an option. The syntax is -r CHANNEL:CHANNEL with the first channel being remapped to the second, setting the second channel to -1 disables the first.
 * Move tritonSwap logic to a centralised place instead of calculating it every time. This allows to mesh well with remaps.
 * Renamed controller outputs to differentiate between rumble and haptics, hopefully the naming is accurate for the 2015 steam controller.
